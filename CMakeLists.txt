@@ -214,6 +214,7 @@ include_directories(
 set(LIB_SOURCES
     src/coreconf_handlers.cpp
     impl/${GENERATED_NAME}-impl.c
+    impl/${GENERATED_NAME}-custom-read.c
     ${HANDLER_SOURCES}
 )
 

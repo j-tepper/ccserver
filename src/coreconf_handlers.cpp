@@ -230,7 +230,15 @@ void handle_fetch(coap_resource_t *resource, coap_session_t *session, const coap
             requestSid = getCoreconfValueAsUint64(requestElement);
         } else if (requestElement->type == CORECONF_ARRAY) {
             // The first element of the array is the request SID, the rest are SID keys
+            // If first element is also an array, we have double-nesting - unwrap it
             CoreconfValueT *requestSidElement = &(requestElement->data.array_value->elements[0]);
+
+            if (requestSidElement->type == CORECONF_ARRAY) {
+                // Unwrap: use the inner array instead (handles [[SID, key]] format)
+                requestElement = requestSidElement;
+                requestSidElement = &(requestElement->data.array_value->elements[0]);
+            }
+
             requestSid = getCoreconfValueAsUint64(requestSidElement);
 
             for (size_t j = 1; j < requestElement->data.array_value->size; j++) {
@@ -524,6 +532,28 @@ void cleanup_handlers() {
     freeSidHandlerRegistry();
 
     std::cout << "CORECONF resources cleaned up" << std::endl;
+}
+
+void* get_coreconf_model() {
+    return (void*)coreconfModel;
+}
+
+void rebuild_clookup_hashmap() {
+    if (!coreconfModel || !clookupHashmap) {
+        std::cerr << "Error: Cannot rebuild clookup - model or hashmap is NULL" << std::endl;
+        return;
+    }
+
+    // Clear existing clookup hashmap
+    hashmap_free(clookupHashmap);
+
+    // Create new hashmap
+    clookupHashmap = hashmap_new(sizeof(CLookupT), 0, 0, 0, clookupHash, clookupCompare, clookupFree, NULL);
+
+    // Rebuild from current coreconfModel
+    buildCLookupHashmapFromCoreconf(coreconfModel, clookupHashmap, 0, 0);
+
+    std::cout << "Clookup hashmap rebuilt" << std::endl;
 }
 
 }  // namespace coreconf

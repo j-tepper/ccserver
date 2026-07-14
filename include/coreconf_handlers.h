@@ -21,6 +21,18 @@ void initialize_handlers(coap_context_t *ctx);
 void cleanup_handlers();
 
 /**
+ * Get the global coreconfModel pointer
+ * Used by implementation code to populate the datastore
+ */
+void* get_coreconf_model();
+
+/**
+ * Rebuild the clookup hashmap after modifying the coreconfModel
+ * Call this after manually adding/modifying data in the datastore
+ */
+void rebuild_clookup_hashmap();
+
+/**
  * Handler for CoAP GET requests
  * Maps to CORECONF GET operation for retrieving single data nodes
  */
