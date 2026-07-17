@@ -230,14 +230,7 @@ void handle_fetch(coap_resource_t *resource, coap_session_t *session, const coap
             requestSid = getCoreconfValueAsUint64(requestElement);
         } else if (requestElement->type == CORECONF_ARRAY) {
             // The first element of the array is the request SID, the rest are SID keys
-            // If first element is also an array, we have double-nesting - unwrap it
             CoreconfValueT *requestSidElement = &(requestElement->data.array_value->elements[0]);
-
-            if (requestSidElement->type == CORECONF_ARRAY) {
-                // Unwrap: use the inner array instead (handles [[SID, key]] format)
-                requestElement = requestSidElement;
-                requestSidElement = &(requestElement->data.array_value->elements[0]);
-            }
 
             requestSid = getCoreconfValueAsUint64(requestSidElement);
 
