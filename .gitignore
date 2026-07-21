@@ -32,3 +32,4 @@ Thumbs.db
 impl/sid.h
 impl/adc*
 impl/uart*
+impl/UART*
