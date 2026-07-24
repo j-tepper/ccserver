@@ -214,9 +214,13 @@ include_directories(
 set(LIB_SOURCES
     src/coreconf_handlers.cpp
     impl/${GENERATED_NAME}-impl.c
-    impl/${GENERATED_NAME}-custom-read.c
     ${HANDLER_SOURCES}
 )
+
+# Add custom-read file if it exists
+if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/impl/${GENERATED_NAME}-custom-read.c)
+    list(APPEND LIB_SOURCES impl/${GENERATED_NAME}-custom-read.c)
+endif()
 
 # Build ccserver as static library (default target)
 add_library(ccserver STATIC ${LIB_SOURCES})
