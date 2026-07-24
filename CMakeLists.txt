@@ -35,7 +35,7 @@ if(EXISTS ${NANOCBOR_DIR}/meson.build)
     ExternalProject_Add(nanocbor_external
         SOURCE_DIR ${NANOCBOR_DIR}
         BINARY_DIR ${NANOCBOR_BUILD_DIR}
-        CONFIGURE_COMMAND meson setup ${NANOCBOR_BUILD_DIR} ${NANOCBOR_DIR} --default-library=static
+        CONFIGURE_COMMAND meson setup ${NANOCBOR_BUILD_DIR} ${NANOCBOR_DIR} --default-library=static -Dtests=false
         BUILD_COMMAND ninja -C ${NANOCBOR_BUILD_DIR}
         INSTALL_COMMAND ""
         BUILD_BYPRODUCTS ${NANOCBOR_BUILD_DIR}/libnanocbor.a
