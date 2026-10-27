@@ -6,4 +6,4 @@
 	url = https://github.com/bergzand/NanoCBOR
 [submodule "external/ccoreconf"]
 	path = external/ccoreconf
-	url = git@github.com:budhe888/ccoreconf.git
+	url = git@github.com:j-tepper/ccoreconf.git
