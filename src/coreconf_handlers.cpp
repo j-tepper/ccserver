@@ -30,7 +30,15 @@ int handlePutRequest(CoreconfValueT **coreconfModel, CoreconfValueT *newValue, s
 
 // TODO: For now we define some globals for testing. These will eventually move into a class once we can design this
 // properly
+<<<<<<< HEAD
 // Made static to avoid symbol conflicts when multiple ccserver libraries are linked
+=======
+<<<<<<< Updated upstream
+// Made static to avoid symbol conflicts when multiple ccserver libraries are linked
+=======
+// Made static to avoid symbol conflicts when multiple bridge libraries are linked
+>>>>>>> Stashed changes
+>>>>>>> 681adb4 (Allow for symbol names to be configurable at compile time to avoid conflicts when running multiple ccservers simultaneously)
 static CoreconfValueT *coreconfModel = NULL;
 static struct hashmap *clookupHashmap = NULL;
 static struct hashmap *keyMappingHashMap = NULL;
