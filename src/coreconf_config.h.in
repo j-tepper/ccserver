@@ -4,7 +4,7 @@
 #ifndef CORECONF_CONFIG_H
 #define CORECONF_CONFIG_H
 
-// Include the generated instance header
+// Always include the instance header (contains buffer definitions)
 #include "@GENERATED_NAME@-instance.h"
 
 #endif // CORECONF_CONFIG_H

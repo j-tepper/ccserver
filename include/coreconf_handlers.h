@@ -6,7 +6,16 @@
 #include <cstdint>
 #include <vector>
 
-namespace coreconf {
+// Macro to create unique namespace per bridge instance
+#ifndef CORECONF_PREFIX
+#define CORECONF_PREFIX default
+#endif
+
+#define _CORECONF_NS_CONCAT(a,b) a##_##b
+#define CORECONF_NS_CONCAT(a,b) _CORECONF_NS_CONCAT(a,b)
+#define CORECONF_NS CORECONF_NS_CONCAT(coreconf, CORECONF_PREFIX)
+
+namespace CORECONF_NS {
 
 /**
  * Initialize CORECONF request handlers
@@ -75,6 +84,13 @@ bool parse_cbor_request(const uint8_t *data, size_t size);
  */
 size_t encode_cbor_response(std::vector<uint8_t> &buffer);
 
-}  // namespace coreconf
+}  // namespace CORECONF_NS
+
+// Convenience alias to restore 'coreconf' name within this bridge's code
+namespace coreconf = CORECONF_NS;
+
+// Forward-declare all known bridge namespaces for main controller use
+namespace coreconf_adc_bridge {}
+namespace coreconf_uart_bridge {}
 
 #endif  // CORECONF_HANDLERS_H
