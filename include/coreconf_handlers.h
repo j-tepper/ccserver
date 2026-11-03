@@ -6,7 +6,16 @@
 #include <cstdint>
 #include <vector>
 
-namespace coreconf {
+// Macro to create unique namespace per bridge instance
+#ifndef CORECONF_PREFIX
+#define CORECONF_PREFIX default
+#endif
+
+#define _CORECONF_NS_CONCAT(a,b) a##_##b
+#define CORECONF_NS_CONCAT(a,b) _CORECONF_NS_CONCAT(a,b)
+#define CORECONF_NS CORECONF_NS_CONCAT(coreconf, CORECONF_PREFIX)
+
+namespace CORECONF_NS {
 
 /**
  * Initialize CORECONF request handlers
@@ -19,6 +28,18 @@ void initialize_handlers(coap_context_t *ctx);
  * Should be called before program exit to free allocated memory
  */
 void cleanup_handlers();
+
+/**
+ * Get the global coreconfModel pointer
+ * Used by implementation code to populate the datastore
+ */
+void* get_coreconf_model();
+
+/**
+ * Rebuild the clookup hashmap after modifying the coreconfModel
+ * Call this after manually adding/modifying data in the datastore
+ */
+void rebuild_clookup_hashmap();
 
 /**
  * Handler for CoAP GET requests
@@ -63,6 +84,13 @@ bool parse_cbor_request(const uint8_t *data, size_t size);
  */
 size_t encode_cbor_response(std::vector<uint8_t> &buffer);
 
-}  // namespace coreconf
+}  // namespace CORECONF_NS
+
+// Convenience alias to restore 'coreconf' name within this bridge's code
+namespace coreconf = CORECONF_NS;
+
+// Forward-declare all known bridge namespaces for main controller use
+namespace coreconf_adc_bridge {}
+namespace coreconf_uart_bridge {}
 
 #endif  // CORECONF_HANDLERS_H

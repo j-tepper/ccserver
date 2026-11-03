@@ -35,7 +35,7 @@ if(EXISTS ${NANOCBOR_DIR}/meson.build)
     ExternalProject_Add(nanocbor_external
         SOURCE_DIR ${NANOCBOR_DIR}
         BINARY_DIR ${NANOCBOR_BUILD_DIR}
-        CONFIGURE_COMMAND meson setup ${NANOCBOR_BUILD_DIR} ${NANOCBOR_DIR} --default-library=static
+        CONFIGURE_COMMAND meson setup ${NANOCBOR_BUILD_DIR} ${NANOCBOR_DIR} --default-library=static -Denable-tests=false
         BUILD_COMMAND ninja -C ${NANOCBOR_BUILD_DIR}
         INSTALL_COMMAND ""
         BUILD_BYPRODUCTS ${NANOCBOR_BUILD_DIR}/libnanocbor.a
@@ -162,11 +162,12 @@ configure_file(
     @ONLY
 )
 
+# Set generated directory (always needed for instance header)
+set(INSTANCE_GENERATED_DIR ${CMAKE_CURRENT_BINARY_DIR}/generated)
+
 # Generate initial datastore from instance .json
 if(INSTANCE_JSON AND SID_FILES_LIST)
     message(STATUS "Code generation enabled for: ${INSTANCE_JSON} to ${GENERATED_NAME}")
-
-    set(INSTANCE_GENERATED_DIR ${CMAKE_CURRENT_BINARY_DIR}/generated)
     set(INSTANCE_GENERATED_HEADER ${INSTANCE_GENERATED_DIR}/${GENERATED_NAME}-instance.h)
 
     # Find uv
@@ -184,9 +185,10 @@ if(INSTANCE_JSON AND SID_FILES_LIST)
         -i ${INSTANCE_JSON}
         -s ${SID_FILES_LIST}
         -o ${INSTANCE_GENERATED_HEADER}
+        -p ${GENERATED_NAME}
         DEPENDS ${INSTANCE_JSON} ${SID_FILES_LIST} ${CCORECONF_DIR}/tools/generateCBORDumps.py
         WORKING_DIRECTORY ${INSTANCE_GENERATED_DIR}
-        COMMENT "Generating code from .json instance"
+        COMMENT "Generating code from .json instance with prefix ${GENERATED_NAME}"
         VERBATIM
     )
 
@@ -194,8 +196,6 @@ if(INSTANCE_JSON AND SID_FILES_LIST)
     add_custom_target(generate_instance
         DEPENDS ${INSTANCE_GENERATED_HEADER}
     )
-else()
-  set(INSTANCE_GENERATED_DIR "")
 endif()
 
 # Include directories
@@ -217,13 +217,19 @@ set(LIB_SOURCES
     ${HANDLER_SOURCES}
 )
 
+# Add custom-read file if it exists
+if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/impl/${GENERATED_NAME}-custom-read.c)
+    list(APPEND LIB_SOURCES impl/${GENERATED_NAME}-custom-read.c)
+endif()
+
 # Build ccserver as static library (default target)
 add_library(ccserver STATIC ${LIB_SOURCES})
 
-add_dependencies(ccserver
-    generate_instance
-    generate_handlers
-)
+if(INSTANCE_JSON)
+    add_dependencies(ccserver generate_instance generate_handlers)
+else()
+    add_dependencies(ccserver generate_handlers)
+endif()
 
 # Link libraries
 target_link_libraries(ccserver PUBLIC
