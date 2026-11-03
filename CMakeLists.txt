@@ -210,15 +210,7 @@ include_directories(
     ${CMAKE_CURRENT_BINARY_DIR}  # For coreconf_config.h
 )
 
-# Library source files for core (generic coreconf_handlers only, no impl)
-set(CORE_SOURCES
-    src/coreconf_handlers.cpp
-)
-
-# Build ccserver_core as static library
-add_library(ccserver_core STATIC ${CORE_SOURCES})
-
-# Legacy target: full library including impl files (for standalone builds)
+# Library source files (always built)
 set(LIB_SOURCES
     src/coreconf_handlers.cpp
     impl/${GENERATED_NAME}-impl.c
@@ -230,7 +222,7 @@ if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/impl/${GENERATED_NAME}-custom-read.c)
     list(APPEND LIB_SOURCES impl/${GENERATED_NAME}-custom-read.c)
 endif()
 
-# Build ccserver as static library (default target, for standalone use)
+# Build ccserver as static library (default target)
 add_library(ccserver STATIC ${LIB_SOURCES})
 
 if(INSTANCE_JSON)
@@ -239,28 +231,14 @@ else()
     add_dependencies(ccserver generate_handlers)
 endif()
 
-# Link libraries for ccserver_core
-target_link_libraries(ccserver_core PUBLIC
-    ${COAP_LIBRARIES}
-    nanocbor
-    ccoreconf
-)
-
-# Compiler options for ccserver_core
-target_compile_options(ccserver_core PRIVATE
-    -Wall
-    -Wextra
-    -Wpedantic
-)
-
-# Link libraries for full ccserver (legacy)
+# Link libraries
 target_link_libraries(ccserver PUBLIC
     ${COAP_LIBRARIES}
     nanocbor
     ccoreconf
 )
 
-# Compiler options for full ccserver (legacy)
+# Compiler options
 target_compile_options(ccserver PRIVATE
     -Wall
     -Wextra
